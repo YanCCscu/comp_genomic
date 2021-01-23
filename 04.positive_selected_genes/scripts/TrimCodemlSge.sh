@@ -1,6 +1,8 @@
 #!/bin/bash
-[[ $# -lt 2 ]] && echo "sh $0 incds.fa|incds.dir intree [suffix] <--default: aligned.fa" && exit 1;
-[[ $# -ge 3 ]] && suffix=$3 || suffix=aligned.fa
+[[ $# -lt 3 ]] && { echo -e "sh $0 incds.fa|incds.dir intree fgsp [suffix] <--default: aligned.fa"; \
+echo -e "\t>>either dir contain cds fasta or single fasta file is ok"; \
+echo -e "\t>>fgsp: one or more foreground species, multispecies should be divided by |, like 'sp1|sp2|...'"; } && exit 1;
+[[ $# -ge 4 ]] && suffix=$4 || suffix=aligned.fa
 toolsdir=$(cd $(dirname $0);pwd)
 workdir=$(pwd)
 outdir=$workdir/pamldir
@@ -9,31 +11,40 @@ outdir=$workdir/pamldir
 [[ -f $1 ]] && alignedfas=($(cd $(dirname $1);pwd)/$(basename $1))
 [[ -d $1 ]] && alignedfas=($(cd $1;pwd)/*.${suffix})
 intree=$2
+fgsp=$3
+count=1
 ###make sge qsub shell
 for alignedfa in ${alignedfas[@]}
 do 
 #-----------------
-echo "make scripts for $alignedfa ..."
+echo "#${count}#----make codeml control files for $alignedfa ..." && let count++
 namekey=$(basename ${alignedfa%.*})
 [[ ! -d $outdir/$namekey ]] && mkdir -p $outdir/$namekey
 sed -i 's/|/ /' $alignedfa
 $toolsdir/trimal -automated1 \
 -in $alignedfa \
--resoverlap 0.75 \
--seqoverlap 85 \
+-resoverlap 0.50 \
+-seqoverlap 50 \
 -out $outdir/$namekey/${namekey}.trimal.fasta \
 -htmlout $outdir/$namekey/${namekey}.trimal.html \
 -colnumbering >$outdir/$namekey/${namekey}.trimal.cols
 
 grep ">" $outdir/$namekey/${namekey}.trimal.fasta | cut -c 2- > $outdir/$namekey/id.list
-
+#skip alignment without forground species
+fgsp_array=(${fgsp//|/ })
+if [[ $(grep -c -P "$fgsp" $outdir/$namekey/id.list) -lt ${#fgsp_array[@]} ]]
+then
+	echo "$alignedfa not all forground species left after trim, so skip it ..." >> gene_failed.log 
+	continue
+fi
 $toolsdir/trimal -phylip_paml \
 -in $outdir/$namekey/${namekey}.trimal.fasta \
 -out $outdir/$namekey/${namekey}.trimal.phy
-
-$toolsdir/nw_prune -v -f $intree $outdir/$namekey/id.list |sed 's/Tbai/Tbai #1/' >$outdir/$namekey/${namekey}.trimal.tre
+fgsp_reg=$(echo $fgsp|sed 's/|/\\|/g')
+$toolsdir/nw_prune -v -f $intree $outdir/$namekey/id.list |sed "s/\($fgsp_reg\)/\1 #1/g" >$outdir/$namekey/${namekey}.trimal.tre
 #or
 #nw_clade hss16.tre $(cat id.list) >EPAS1.cds.prank.trimal.tre
+
 cat <<EOF >>psg.sge.sh
 cd $outdir/$namekey/
 sh $toolsdir/apply_site_branch.sh -a ${namekey}.trimal.phy -t ${namekey}.trimal.tre
@@ -44,4 +55,4 @@ done
 
 echo -e "Now you can submit batchfile to sge cluster with command like:\n";
 echo -e "nohup qsub-sge.pl -res vf=1G,p=1 -l 3 -c no -m 100 -j psg psg.sge.sh &\n"
-echo -e "cat $outdir/*/*.lnL.log to collect lnL out info"
+echo -e "Finaly!!! you can 'cat $outdir/*/*.lnL.log to collect lnL out info'"

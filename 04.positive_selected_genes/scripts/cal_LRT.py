@@ -1,6 +1,7 @@
 #!/bin/env python3
 import sys,re,os
 toolsdir=os.path.dirname(os.path.abspath(sys.argv[0]))
+chiq=toolsdir+'/chi2'
 if len(sys.argv)<3:
 	print("USAGE: %s null.mlc alte.mlc"%sys.argv[0])
 	sys.exit(1)
@@ -44,11 +45,15 @@ with open(mlc_nul,'r') as mlcnul:
 with open(mlc_alt,'r') as mlcalt:
 	lnlalt=get_mlc_info(mlcalt)
 
+GeneID=get_name_comm(mlc_nul,mlc_alt)
 df=int(lnlalt[0])-int(lnlnul[0])
 LRT=2*(float(lnlalt[1])-float(lnlnul[1]))
-chiq=toolsdir+'/chi2'
-plist=os.popen('%s %s %s'%(chiq,df,LRT)).readlines()
-print(plist[1],file=sys.stderr)
-p=re.search(r'prob = \S+ = (\S+)',plist[1]).groups()[0]
-GeneID=get_name_comm(mlc_nul,mlc_alt)
+#print("%s\t%s\t%s\t%s\t%s"%(GeneID,lnlnul[1],lnlalt[1],df,":".join(lnlalt[2])))
+if LRT > 0:
+	plist=os.popen('%s %s %s'%(chiq,df,LRT)).readlines()
+	print(plist[1],file=sys.stderr)
+	p=re.search(r'prob = \S+ = (\S+)',plist[1]).groups()[0]
+else:
+	p=1
+#print("geneid\tlnL.nul\tlnL.alt\tdf\tp\tsites")
 print("%s\t%s\t%s\t%s\t%s\t%s"%(GeneID,lnlnul[1],lnlalt[1],df,p,":".join(lnlalt[2])))
