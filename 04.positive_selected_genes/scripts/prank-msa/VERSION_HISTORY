@@ -1,0 +1,121 @@
+v.150803
+- force linear order of alignment anchors
+- convert multifurcating trees to bifurcating ones
+- finish despite BppAncestor failing
+
+
+v.140603
+- now avoids crashes due to weird sequence names
+- now (codon) ancestral reconstructio also for translated alignments
+- new option '-njgaps' to consider gaps as mismatches for NJ distances
+
+
+v.140110
+- a fix for the external tool paths
+
+
+v.131211
+- search order for external tools changed: use own one first
+- '-nobbpa' to run without BppAncestors (even when available)
+- a fix for rare crashes due to overly long branch lengths
+
+
+v.131119
+- ancestor inference for translated alignments of DNA sequences
+- new option '-treeonly'
+
+
+v.130820
+- disabled copmutation of alignment score for the guide tree alignment
+- more information about iteration with a user-provided tree
+- workaround for a BppAncestor bug causing incomplete last codon
+- path to other binaries no more affected by renaming of the program file
+
+
+v.130708
+- Significant bug fixes -- update *strongly* recommended:
+ * option -F was mistakenly turned off by the new iterative approach
+ * without option -F, ancestor reconstruction (and scoring) were incorrect
+
+
+v.130410
+- More information about optimization score and fix for last alignment
+- Minor fixes on alignment conversion and use of external models
+
+
+v.130129
+- Introduced alignment score and automatic iteration to maximise the score
+- Changed interface for the analysis input and output
+- New output: inferred evolutionary events per branch
+
+
+v.121218
+- More detailed information about unmatching names. New option "-prunedata".
+
+
+v.121212
+- Support for some NHX tags.
+
+
+v.121210
+- Fixed underflow errors affecting ancestral reconstruction of large
+  alignments.
+
+
+v.121018
+- Ancestral sequences can differently indicate insertions and deletions.
+- Can update an alignment, recomputing nodes with tag "[&&NHX:XN=realign]"
+
+
+v.121002
+- Alignment merge now accepts trees such as "(t1:#.#,t2:#.#);".
+  Provided with "-t=filename" or "-tree=tree-string".
+
+
+v.120827
+- All files now under the GPL licence.
+
+
+v.120814
+- Can now also merge "alignments" of one sequence
+- New option '-mergedist=#' to define the distance for two alignments
+
+
+v.120717
+- All input data now converted to upper-case.
+
+
+v.120716
+- Fixed the translated alignment (been broken in recent clean up)
+- Fixed the output order of ancestral sequences
+
+
+v.120712
+- For codon alignment, MAFFT guide tree now with protein sequences
+  (fixes several issues with codon alignment)
+
+
+v.120626
+- Guide tree estimation from a MAFFT alignment
+- Merge of two pre-defined alignments
+- Support for Exonerate and MAFFT on Windows
+- Clean up of some code
+
+
+v.111130
+- Exonerate anchoring now also for guidetree computation. Experimental!
+
+
+v.111129
+- Allow guide trees with no branch lengths. Default branch length is 0.1;
+  use -fixedbranches=# to change.
+- Removed the dependency to boost libraries.
+
+
+v.111013
+- First update in Google Code
+- Alignment speed ups with Exonerate anchoring.
+
+
+v.101018
+- Last version before migration to Google Code

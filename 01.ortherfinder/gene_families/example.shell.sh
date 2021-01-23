@@ -1,0 +1,1 @@
+perl ../bin/run_orthofinder.pl -p /data/tools/BGI_tools/BGI_pipelie_update/01.gene_families/input/pep -c /data/tools/BGI_tools/BGI_pipelie_update/01.gene_families/input/cds --cpu1 10 --cpu2 100 --cpu3 56
