@@ -1,8 +1,9 @@
 #!/bin/bash
-[[ $# -lt 3 ]] && { echo -e "sh $0 incds.fa|incds.dir intree fgsp [suffix] <--default: aligned.fa"; \
+[[ $# -lt 3 ]] && { echo -e "sh $0 incds.fa|incds.dir intree forground_sp [PSG|QEG] [suffix] <--default: aligned.fa"; \
 echo -e "\t>>either dir contain cds fasta or single fasta file is ok"; \
 echo -e "\t>>fgsp: one or more foreground species, multispecies should be divided by |, like 'sp1|sp2|...'"; } && exit 1;
-[[ $# -ge 4 ]] && suffix=$4 || suffix=aligned.fa
+[[ $# -ge 4 ]] && runmodel=$4 || runmodel=PSG
+[[ $# -ge 5 ]] && suffix=$5 || suffix=aligned.fa
 toolsdir=$(cd $(dirname $0);pwd)
 workdir=$(pwd)
 outdir=$workdir/pamldir
@@ -44,15 +45,16 @@ fgsp_reg=$(echo $fgsp|sed 's/|/\\|/g')
 $toolsdir/nw_prune -v -f $intree $outdir/$namekey/id.list |sed "s/\($fgsp_reg\)/\1 #1/g" >$outdir/$namekey/${namekey}.trimal.tre
 #or
 #nw_clade hss16.tre $(cat id.list) >EPAS1.cds.prank.trimal.tre
-
-cat <<EOF >>psg.sge.sh
+[[ "$runmodel" == "PSG" ]] && scriptsfile=psg.sge.sh || scriptsfile=qeg.sge.sh
+[[ "$runmodel" == "PSG" ]] && runscripts=apply_site_branch.sh || runscripts=apply_branch.sh
+cat <<EOF >>$scriptsfile
 cd $outdir/$namekey/
-sh $toolsdir/apply_site_branch.sh -a ${namekey}.trimal.phy -t ${namekey}.trimal.tre
+sh $toolsdir/$runscripts -a ${namekey}.trimal.phy -t ${namekey}.trimal.tre
 $toolsdir/cal_LRT.py ${namekey}.trimal.nul.mlc ${namekey}.trimal.alt.mlc >${namekey}.lnL.log
 EOF
 #------------------
 done
 
 echo -e "Now you can submit batchfile to sge cluster with command like:\n";
-echo -e "nohup qsub-sge.pl -res vf=1G,p=1 -l 3 -c no -m 100 -j psg psg.sge.sh &\n"
+echo -e "nohup qsub-sge.pl -res vf=1G,p=1 -l 3 -c no -m 100 -j $runmodel $scriptsfile &\n"
 echo -e "Finaly!!! you can 'cat $outdir/*/*.lnL.log to collect lnL out info'"

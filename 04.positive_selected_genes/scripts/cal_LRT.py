@@ -15,6 +15,12 @@ def get_mlc_info(mlc):
 			mlnl=re.search(r'lnL\(ntime:\s+\d+\s+np:\s+(\d+)\):\s+(\S+)\s+\S+', line)
 			np=mlnl.groups()[0]
 			lnl=mlnl.groups()[1]
+		#for QEG get w
+		if line.startswith('w (dN/dS) for branches:'):
+			m=re.search(r'w \(dN/dS\) for branches:\s+(\S+)\s+(\S+)',line)
+			if m:
+				candsites.append("/".join(m.groups()))
+		#for PSG get sites
 		if line.startswith('Bayes Empirical Bayes (BEB) analysis'):
 			line=mlc.readline()
 			while True:
