@@ -59,7 +59,7 @@ cat <<EOF > sitebranch.alt.ctl
        getSE = 0       * 0: don't want them, 1: want S.E.s of estimates
 RateAncestor = 0       * (0,1,2): rates (alpha>0) or ancestral states (1 or 2)
   Small_Diff = .45e-6  * Default value.
-   cleandata = 1       * remove sites with ambiguity data (1:yes, 0:no)?
+   cleandata = 0       * remove sites with ambiguity data (1:yes, 0:no)?
  fix_blength = 0       * 0: ignore, -1: random, 1: initial, 2: fixed
 EOF
 #NOTE: We estimate the Ts/Tv ratio (fix_kappa = 0) and the dN/dS (fix_omega = 0). 
@@ -93,7 +93,7 @@ cat <<EOF > sitebranch.nul.ctl
        getSE = 0       * 0: don't want them, 1: want S.E.s of estimates
 RateAncestor = 0       * (0,1,2): rates (alpha>0) or ancestral states (1 or 2)
   Small_Diff = .45e-6  * Default value.
-   cleandata = 1       * remove sites with ambiguity data (1:yes, 0:no)?
+   cleandata = 0       * remove sites with ambiguity data (1:yes, 0:no)?
  fix_blength = 0       * 0: ignore, -1: random, 1: initial, 2: fixed
 EOF
 
