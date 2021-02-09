@@ -1,6 +1,8 @@
 #!/bin/env python3
 import sys
-
+if len(sys.argv)<3:
+	print("%s gfffile source<--ensembl|ncbi"%sys.argv[0])
+	sys.exit(1)
 #---------some useful function----------------#
 def get_lens(starts,ends):
 	sumlen=0
@@ -15,7 +17,6 @@ def aid(gid):
 		return(gid.split('-',1)[1])
 
 #---------parse gff3file----------------#
-
 gffdb={}
 with open(sys.argv[1]) as gfile:
 	geneid=''
