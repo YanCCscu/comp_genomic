@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #
 # $Id: revtrans.py,v 1.10 2005/06/09 09:58:54 raz Exp $
@@ -272,7 +272,7 @@ def matchtrans(dnaseqs,pepseqs,gapin,verbose,mtx,allinternal,readthroughstop):
 			dnaref[newpep] = key
 			
 	for key in pepseqs.keys():
-	 	pep,note = pepseqs[key]
+		pep,note = pepseqs[key]
 		pep = degap(pep,gapin).upper()
 
 		# Strip terminal stop-codon
