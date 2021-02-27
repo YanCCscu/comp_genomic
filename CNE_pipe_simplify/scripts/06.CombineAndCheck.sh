@@ -1,13 +1,16 @@
 #!/bin/bash
+[[ $# -lt 2 ]] && echo -e "\e[1;91msh $0 splitfam gfffile\n\e[0m" && exit 1
+splitmaf=$1
+cds_gff=$2 #Tbai.gff
 gerp_dir=gerp_dir
 phast_dir=phast_dir
 cmdir=$(cd $(dirname $0);pwd)
 bed_tools_bin=$cmdir/bedtools2/bin
-cds_gff=Tbai.gff
+echo -e "filter gff to keep only cds ..."
 awk '$3=="CDS"' $cds_gff >${cds_gff%.gff}.cds.gff
 [[ -d CNE ]] || mkdir -p CNE
 ((1)) && {
-for maf in splitmaf/*.maf
+for maf in $splitmaf/*.maf
 do 
 	maf=$(basename $maf)
 	((0)) && {
