@@ -134,7 +134,7 @@ sub filtered_bed{
 			$line[1]=$newleft;
 			my $bed=join"\t",@line[0..3];
 			my $len=$line[2]-$line[1];
-			#print "newleft: ",$bed;
+			#print "newleft: ",$newleft,"\n";
                 	push @bed_filtered,$bed,if($len >= 30); 
 			
 		}
@@ -143,7 +143,7 @@ sub filtered_bed{
                         $line[2]=$right;
                         my $bed=join"\t",@line[0..3];
                         my $len=$line[2]-$line[1];
-			#print "newright: ",$bed;
+			#print "newright: ",$right,"\n";
                         push @bed_filtered,$bed,if($len >= 30);
 
 		}
@@ -156,8 +156,8 @@ sub filtered_bed{
 			my $name2 = "$line[3]_2";
 			my $bed1=join"\t",($line[0],$line[1],$newright,$name1);
 			my $bed2=join"\t",($line[0],$newleft,$line[2],$name2);
-			#print "Bnewright: ",$bed1;
-			#print "Bnewleft: ",$bed2;
+			#print "Bnewright: ",$newright,"\n";
+			#print "Bnewleft: ",$newleft,"\n";
 			push @bed_filtered,$bed1,if($len1 >= 30);
 			push @bed_filtered,$bed2,if($len2 >= 30);
 		}
@@ -173,7 +173,7 @@ sub filtered_bed{
 
 sub out_put_seq{
 	my ($bed,$maf_seq,$file)=@_;
-	mkdir "Bed.fa/$file";
+	`mkdir -p Bed.fa/$file`;
 	foreach my $bed_line(@{$bed}){
 		my @line=split/\t/,$bed_line;
 		my $len=$line[2]-$line[1];
@@ -181,11 +181,13 @@ sub out_put_seq{
 		my %nr=();
 		@names=grep{++$nr{$_}<2} @names;
 		my $fa_name=join"\.",@names;
-		print "----$line[0],$line[1], $line[2], $fa_name\n";
+		print "bedline----$line[0],$line[1], $line[2], $fa_name\n";
 		$line[3]=$fa_name;
 		foreach my $seq(keys %{$maf_seq}){
 			my @heads=split/\-/,$seq;
                 	if($heads[0]=~/$line[0]/ && $line[1] >= $heads[1] && $line[1]-1 <= $heads[2] && $line[2]-1 <= $heads[2]){
+				print "header----@heads\n";
+				print "output sequences to ---->> Bed.fa/$file/$fa_name.fa\n";
                 		open FA,">Bed.fa/$file/$fa_name.fa" or die "can not open >Bed.fa/$file/$fa_name.fa";
 				my @infor=split/=/,${$maf_seq{$seq}}[0];
 				my $ref_seq=$infor[2];
@@ -209,14 +211,16 @@ sub out_put_seq{
 						$i++;
 					}
 					if($base_count<$len && $flag == 1 && $ref_seqbase[$i] ne '-'){
+						$ali_end=$i; #add by ycc
 						$base_count++;
 					}
-					if($base_count == $len){
+					if($base_count == $len-1){ #the bed fie is 0-based ranges >> $#ref_seqbase also 0 based
 						$ali_end=$i;
+						#print "INN------------>$i,$len,$start,$base_count_start,$base_count,$ali_end\n"; 
 						last;
 					}
+					#print "------------>$#ref_seqbase,$i,$len,$start,$base_count_start,$base_count,$ali_end\n"; 
 				}
-				print "------------$base_count_start,$base_count,$ali_end\n"; 
 				if($ali_end == 0){
 					mkdir "Join_fa/$file";
 					open Join,">Join_fa/$file/$line[3].fa";
@@ -228,7 +232,7 @@ sub out_put_seq{
                         		my @infor=split/=/,$in;
 					my $len_ali=$ali_end-$start_new+1;
                                 	my $out_seq=substr($infor[2],$start_new,$len_ali);
-                               		print FA">$infor[0]|$infor[1]|length:$len:ali:$len_ali\n$out_seq\n";
+                               		print FA">$infor[0]|$infor[1]+$start_new|length:$len:ali:$len_ali\n$out_seq\n";
 				}
                 	}
       		}
