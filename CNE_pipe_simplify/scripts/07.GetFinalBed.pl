@@ -9,11 +9,13 @@ use File::Basename;
 use File::Spec;
 my $path_curf = File::Spec->rel2abs(__FILE__);
 my ($vol, $dir, $file) = File::Spec->splitpath($path_curf);
-my($maf_dir,$seq_full_len);
+my($maf_dir,$treefile,$seq_full_len);
 my($seqname,%maf_seq);
-my $prank_bin = '/data/nfs/OriginTools/bin';
+#my $prank_bin = '/data/nfs/OriginTools/bin';
+my $MINLEN=30;
 GetOptions(
         "maf_dir|m:s"=>\$maf_dir,
+        "treefile|t:s"=>\$treefile,
         "help|?"=>\&USAGE,
         );
 &USAGE,if(! $maf_dir);
@@ -121,7 +123,7 @@ sub filtered_bed{
 		my @line=split/\t+/;
 		my $len=$line[2]-$line[1];
 #		print "get no overlap items\n";
-		push @bed_filtered,$_,if($len >= 30);
+		push @bed_filtered,$_,if($len >= $MINLEN);
 	}
 	close BEDc;
 	#cds overlaped bed and trim range to outside the coding regions 
@@ -135,7 +137,7 @@ sub filtered_bed{
 			my $bed=join"\t",@line[0..3];
 			my $len=$line[2]-$line[1];
 			#print "newleft: ",$newleft,"\n";
-                	push @bed_filtered,$bed,if($len >= 30); 
+                	push @bed_filtered,$bed,if($len >= $MINLEN ); 
 			
 		}
 		if($line[1] <= $line[7] && $line[2] <= $line[8] && $line[2] >= $line[7]){
@@ -144,7 +146,7 @@ sub filtered_bed{
                         my $bed=join"\t",@line[0..3];
                         my $len=$line[2]-$line[1];
 			#print "newright: ",$right,"\n";
-                        push @bed_filtered,$bed,if($len >= 30);
+                        push @bed_filtered,$bed,if($len >= $MINLEN);
 
 		}
 		if($line[1] <= $line[7] && $line[2] >= $line[8]){
@@ -158,8 +160,8 @@ sub filtered_bed{
 			my $bed2=join"\t",($line[0],$newleft,$line[2],$name2);
 			#print "Bnewright: ",$newright,"\n";
 			#print "Bnewleft: ",$newleft,"\n";
-			push @bed_filtered,$bed1,if($len1 >= 30);
-			push @bed_filtered,$bed2,if($len2 >= 30);
+			push @bed_filtered,$bed1,if($len1 >= $MINLEN);
+			push @bed_filtered,$bed2,if($len2 >= $MINLEN);
 		}
 		if($line[1] >= $line[7] && $line[2] <= $line[8]){
 			next;
@@ -232,15 +234,18 @@ sub out_put_seq{
                         		my @infor=split/=/,$in;
 					my $len_ali=$ali_end-$start_new+1;
                                 	my $out_seq=substr($infor[2],$start_new,$len_ali);
-                               		print FA">$infor[0]|$infor[1]+$start_new|length:$len:ali:$len_ali\n$out_seq\n";
+                               		#print FA ">$infor[0]|$infor[1]+$start_new|length:$len:ali:$len_ali\n$out_seq\n";
+                               		print "Fasta Seq Info: $infor[0]|$infor[1]+$start_new|length:$len:ali:$len_ali\n" if $infor[0] =~/Tbai/;
+                               		my @fassp=split/_/,$infor[0];
+                               		print FA">$fassp[0]\n$out_seq\n";
 				}
                 	}
       		}
 		close FA;
-		open IDLIST,">>IDlist.txt";
 		open FINAL_BED,">>final.all.bed";
 		$bed_line=join"\t",@line;
-		print IDLIST "$fa_name\n";
+		#open IDLIST,">>IDlist.txt";
+		#print IDLIST "$fa_name\n";
 		print FINAL_BED "$bed_line\n";
 		&getperID("Bed.fa/$file/$fa_name.fa",$dir),if(-e "Bed.fa/$file/$fa_name.fa");
 		if(! -e "Bed.fa/$file/$fa_name.fa"){
@@ -254,8 +259,8 @@ sub out_put_seq{
 sub getperID{
 	my $file=shift;
 	my $dir=shift;
-	print "... python $dir/getperID.py $file ...\n";
-	system("python $dir/getperID.py $file");
+	print "... python $dir/getperID.py $file $treefile...\n";
+	system("python $dir/getperID.py $file $treefile");
 	#system("mv $file.peridglobal ./GlopperID");
 	#system("mv $file.peridlocal ./LocalperID");
 }
@@ -270,9 +275,10 @@ Description:
 Usage:
     options:
     --maf_dir|-m       <string>  path for maf files dir 
+    --treefile|-t       <string>  guide tree for prank 
     --help|-h           	print this information 
 Example:
-perl $0 -m splitmaf 
+perl $0 -m splitmaf -t guide.tree 
 USAGE
    print $usage;
    exit;

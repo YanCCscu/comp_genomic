@@ -6,8 +6,9 @@ from Bio import SeqIO
 g='\033[1;32m'
 r='\033[1;91m'
 b='\033[0m'
-if len(sys.argv)<2:
-	print("%sUSAGE: python %s in.fas"%(g,sys.argv[0],b))
+MINLEN=30
+if len(sys.argv)<3:
+	print("%sUSAGE: python %s in.fas in.tree"%(g,sys.argv[0],b))
 	sys.exit("%s---------: Nothing Have Done :-------------%s"%(g,b))
 #sys.argv[1]='10000.maf.GERP49.fa.anc.dnd'
 #t = Tree("(A:1,(B:0.5,E:0.5):0.5);", format = 1 )
@@ -76,10 +77,11 @@ if __name__ == "__main__":
 	myfas=sys.argv[1]
 	SeqID=os.path.basename(sys.argv[1]).replace('.fas','').replace('.fa','')
 	outdir=os.path.dirname(sys.argv[1])
+	mytree=sys.argv[2]
 #run prank 
 	prank="/data/nfs/OriginTools/bin/prank"
 ##### run prank #####
-	prankcommand="%s -d=%s -o=%s -showtree -showanc -keep -prunetree -quiet -seed=10"%(prank,myfas,myfas)
+	prankcommand="%s -d=%s -o=%s -t=%s -showtree -showanc -keep -prunetree -quiet -seed=10"%(prank,myfas,myfas,mytree)
 	#subprocess.check_call(prankcommand, shell=True)
 	runcmd(prankcommand)
 	myancfas=myfas+".anc.fas"
@@ -99,21 +101,21 @@ if __name__ == "__main__":
 		for (m,n) in sorted(leafRoot, key=lambda x: x[0]):
 			(match,alllen)=GetPerID(fasdict[m],fasdict[n])
 			leaves_sps.append(m)
-			if alllen>=30:
+			if alllen>=MINLEN:
 				percent_id=match/alllen
 				global_ids.append(str(percent_id))
 			else:
 				global_ids.append("NA")
-		print("species","\t","\t".join(leaves_sps),file=PERIDGLO)
-		print(SeqID,"\t","\t".join(global_ids),file=PERIDGLO)
+		print("species"," "," ".join(leaves_sps),file=PERIDGLO,sep="")
+		print(SeqID," "," ".join(global_ids),file=PERIDGLO,sep="")
 #-------------write peridlocal
 	print(g,"%s output internode identity refer to its MRA ..."%SeqID,b)
 	with open(outdir+"/"+SeqID+".peridlocal",'w') as PERIDLOC:
-		print("branch\tid\tpid",file=PERIDLOC)
+		print("branch id pid",file=PERIDLOC)
 		for (k,p) in nodesAnc:
 			(match,alllen)=GetPerID(fasdict[k],fasdict[p])
-			if alllen>=30:
+			if alllen>=MINLEN:
 				if k in ancnum2name:
-					print("%s\t%s\t%f"%(ancnum2name[k],SeqID,match/alllen),file=PERIDLOC) 
+					print("%s %s %f"%(ancnum2name[k],SeqID,match/alllen),file=PERIDLOC,sep="") 
 				else:
-					print("%s\t%s\t%f"%(k,SeqID,match/alllen),file=PERIDLOC)
+					print("%s %s %f"%(k,SeqID,match/alllen),file=PERIDLOC,sep="")

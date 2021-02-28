@@ -25,7 +25,7 @@ do
 	for mafblock in MAFBLOCKS/${maf}.block*.maf
 	do
 		blockid=$(basename ${mafblock%.maf*.maf})
-		blockid=${blockid#all}
+		#blockid=${blockid#all}
 		block_scaf=$(awk '{sp="'$ref_species'";if(a=index($2,sp)){print $2}}' $mafblock)
 		block_start=$(awk '{sp="'$ref_species'";if(a=index($2,sp)){print $3}}' $mafblock)
 		sed 's/_\S\+//' $mafblock >${mafblock}.c

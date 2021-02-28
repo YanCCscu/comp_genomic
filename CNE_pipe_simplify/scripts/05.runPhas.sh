@@ -47,5 +47,5 @@ ls  $mafdir/*.maf.c| parallel -j 20 -I{} runphast {}
 grep $refsp $mafdir/all*.maf|cut -d ' ' -f1-2|sort -u|sed 's/\:s /\t/'|sed -e 's/splitmaf\///' -e 's/.maf//' > maf_scaffold_idmapping.list
 ls $phast_dir/*.con.bed |\
 parallel -j 20  -I{} python $cmdir/IDMappingReplace.py -m maf_scaffold_idmapping.list -a {} -t 1 -o {}.cname.phas.bed
-sed -i -e 's/all\([[:digit:]]\+\)\.maf/\1\.maf\.phast/' $phast_dir/*.c.con.bed.cname.phas.bed
+sed -i -e 's/all\([[:digit:]]\+\)\.maf/all\1\.maf\.phast/' $phast_dir/*.c.con.bed.cname.phas.bed
 
