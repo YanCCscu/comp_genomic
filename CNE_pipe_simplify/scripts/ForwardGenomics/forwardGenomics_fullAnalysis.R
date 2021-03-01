@@ -70,7 +70,7 @@ loopElements = function(){
       }
 
       ## Save the result in a text file
-      cat("########## now saveing ",elID)
+      cat("########## now saveing ",elID,"\n")
       saveResult( elID )
     }
 }

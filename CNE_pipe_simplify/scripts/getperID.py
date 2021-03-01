@@ -95,7 +95,7 @@ if __name__ == "__main__":
 	(leafRoot,nodesAnc,ancnum2name)=ParseTree(myanctree)
 	#print("node:ancnode--->:\n",leafRoot,"\n",nodesAnc,"\n",ancnum2name)
 #------------write peridglobal
-	print(g,"%s output leaves identity refer to its MRA ..."%SeqID,b)
+	print(g,"%s output leaves identity refer to root node ..."%SeqID,b)
 	with open(outdir+"/"+SeqID+".peridglobal",'w') as PERIDGLO:
 		global_ids=[];leaves_sps=[]
 		for (m,n) in sorted(leafRoot, key=lambda x: x[0]):
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 		print("species"," "," ".join(leaves_sps),file=PERIDGLO,sep="")
 		print(SeqID," "," ".join(global_ids),file=PERIDGLO,sep="")
 #-------------write peridlocal
-	print(g,"%s output internode identity refer to its MRA ..."%SeqID,b)
+	print(g,"%s output internode identity refer to its MRCA ..."%SeqID,b)
 	with open(outdir+"/"+SeqID+".peridlocal",'w') as PERIDLOC:
 		print("branch id pid",file=PERIDLOC)
 		for (k,p) in nodesAnc:
