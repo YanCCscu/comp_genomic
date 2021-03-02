@@ -13,11 +13,9 @@ awk '$3=="CDS"' $cds_gff >${cds_gff%.gff}.cds.gff
 for maf in $splitmaf/*.maf
 do 
 	maf=$(basename $maf)
-	((0)) && {
+	((1)) && {
 	#reshape GERP results
-	cat MAFBLOCKS/$maf*.block*.GERP.rates.elems.f > $gerp_dir/${maf}.c.con.bed.cname.GERP.bed
-	awk -v OFS="\t" 'BEGIN{i=1}{i++;gsub("GERP","maf.GERP"i,$7);printf("%s\t%s\t%s\t%s\t0\t+\n",$1,$2,$3,$7)}' $gerp_dir/${maf}.c.con.bed.cname.GERP.bed \
-	> $gerp_dir/${maf}.c.con.bed.cname.gerp.bed
+	cat MAFBLOCKS/$maf*.block*.GERP.rates.elems.f > $gerp_dir/${maf}.c.con.bed.cname.gerp.bed
 	#merge GERP and PHAST results
 	cat $phast_dir/${maf}.c.con.bed.cname.phas.bed $gerp_dir/${maf}.c.con.bed.cname.gerp.bed > CNE/${maf}.c.con.bed.cname.bed.phas-gerp.bed
 	#sort by Chrom and Start Pos
@@ -32,4 +30,3 @@ do
 	printf "produced files: %s ...\n" ./CNE/${maf}.c.con.bed.cname.bed.[no.]overlap 
 done
 }
-

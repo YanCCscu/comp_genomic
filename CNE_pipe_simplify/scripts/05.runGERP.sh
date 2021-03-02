@@ -13,12 +13,14 @@ cmdir=$(cd $(dirname $0);pwd)
 [[ -d $gerp_command ]] || mkdir -p $gerp_command
 phast_bin=$cmdir/tools/phast-1.3/bin
 #--------split maf into blocks
-((0)) && {
+((1)) && {
+echo -e "\e[1;91mNOTE: for sure to Clean the MAFBLOCKS dir!!!\e[0m\n"
 [[ -d MAFBLOCKS ]] || mkdir -p MAFBLOCKS
-#ls $mafdir/*.maf|parallel -j 20 -I{} awk -f tools/awk_split_maf.awk {} MAFBLOCKS
-for f in $mafdir/*.maf;do echo awk -v total_line=$(wc -l $f|cut -d" " -f1) -f tools/awk_split_maf.awk $f MAFBLOCKS;done|parallel -j 20
+#ls $mafdir/*.maf|parallel -j 20 -I{} awk -f $cmdir/awk_split_maf.awk {} MAFBLOCKS
+echo -e "\e[1;91msplit maf to block per file\e[0m\n"
+for f in $mafdir/*.maf;do echo awk -v total_line=$(wc -l $f|cut -d" " -f1) -f $cmdir/awk_split_maf.awk $f MAFBLOCKS;done|parallel -j 20
 }
-#echo -e "submmit jobs with the following scripts:"
+echo -e "submmit jobs with the following scripts:"
 for maf in $mafdir/*.maf
 do
 	maf=$(basename $maf)
@@ -33,11 +35,11 @@ do
 echo -e "\e[91mrun GERP for block $mafblock ...\e[0m"
 $cmdir/gerpcol -t $tree -f $curdir/${mafblock}.c -x .GERP.rates -e $ref_species
 $cmdir/gerpelem -c $block_scaf -s $block_start -w .ex -f $curdir/${mafblock}.c.GERP.rates -d 0.01
-awk -v id=$blockid -v OFS="\t" '{\$7=id".maf.GERP";printf("%s\t%s\t%s\t%s\t0\t+\n",\$1,\$2,\$3,\$7)}' $curdir/${mafblock}.c.gerp.rates.elems > $curdir/${mafblock}.c.gerp.rates.elems.f 
+awk -v id=$blockid -v OFS="\t" '{\$7=id".maf.GERP";printf("%s\t%s\t%s\t%s\t0\t+\n",\$1,\$2,\$3,\$7)}' $curdir/${mafblock}.c.GERP.rates.elems > $curdir/${mafblock}.c.GERP.rates.elems.f 
 EOF
 	done
 done
 cat $gerp_command/runGERP_*.sh >batch_runGERP.sh
-echo -e "nohup qsub-sge.pl -l 4 -res vf=16G,p=1 -c no -m 100 -j mafgerp batch_runGERP.sh &"
+echo -e "nohup qsub-sge.pl -l 4 -res vf=6G,p=1 -c no -m 100 -j mafgerp batch_runGERP.sh &"
 
 ##################################################

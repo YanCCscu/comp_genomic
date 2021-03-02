@@ -9,6 +9,7 @@ prefix=$1
 species_number=$2
 split_number=$3
 [[ -d splitmaf ]] || mkdir -p splitmaf
+rm ${prefix}.*filtered.final.maf
 for i in ${prefix}.*
 do
 	$cmdir/kent/bin/linux.x86_64/mafFilter -minRow=$species_number -minScore=20000 $i > ${i}.filtered.final.maf

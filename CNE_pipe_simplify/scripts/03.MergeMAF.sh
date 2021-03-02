@@ -1,6 +1,8 @@
 #!/bin/bash
-[[ $# -lt 1 ]] && echo -e "\e[1;91msh $0 tree mafdir refsp splnum\e[0m\n" && exit 1
-#example: sh tools/03.MergeMAF.sh CNE.tre AllMAF Tbai 20
+[[ $# -lt 1 ]] && {
+echo -e "\e[1;91msh $0 tree mafdir refsp splnum\e[0m\n" 
+echo -e "example: sh tools/03.MergeMAF.sh CNE.tre AllMAF Tbai 20\n"
+} && exit 1
 treefile=$1
 AllMAF=$2
 refsp=$3
