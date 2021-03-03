@@ -22,6 +22,8 @@ GetOptions(
 #-------------------------------------------------------------
 #main process
 #-------------------------------------------------------------
+open FINAL_BED,">final.all.bed";
+open GETID, ">batch_getID.sh";
 opendir DIR,"$maf_dir" or die "can not open $maf_dir";
 while(my $file=readdir DIR){
 	next,unless($file=~/\.maf\.c$/);
@@ -224,10 +226,10 @@ sub out_put_seq{
 					#print "------------>$#ref_seqbase,$i,$len,$start,$base_count_start,$base_count,$ali_end\n"; 
 				}
 				if($ali_end == 0){
-					mkdir "Join_fa/$file";
-					open Join,">Join_fa/$file/$line[3].fa";
+					#mkdir "Join_fa/$file";
+					#open Join,">Join_fa/$file/$line[3].fa";
 					print "---------------->$infor[0]|$infor[1]|length:$len:bed:$line[1]:maf:$heads[1]-$heads[2]:base:$base_count,len:$len,ali:$ali_end\n";
-					print Join ">$infor[0]|$infor[1]|length:$len:bed:$line[1]:maf:$heads[1]-$heads[2]:base:$base_count,len:$len,ali:$ali_end\n";
+					#print Join ">$infor[0]|$infor[1]|length:$len:bed:$line[1]:maf:$heads[1]-$heads[2]:base:$base_count,len:$len,ali:$ali_end\n";
 					last;
 				}
                         	foreach my $in(@{$maf_seq{$seq}}){
@@ -239,31 +241,30 @@ sub out_put_seq{
                                		my @fassp=split/_/,$infor[0];
                                		print FA">$fassp[0]\n$out_seq\n";
 				}
+				
+				$bed_line=join"\t",@line;
+				print FINAL_BED "$bed_line\n";
+				print GETID "python $dir/getperID.py Bed.fa/$file/$fa_name.fa $treefile\n";
                 	}
       		}
 		close FA;
-		open FINAL_BED,">>final.all.bed";
-		$bed_line=join"\t",@line;
-		#open IDLIST,">>IDlist.txt";
-		#print IDLIST "$fa_name\n";
-		print FINAL_BED "$bed_line\n";
-		&getperID("Bed.fa/$file/$fa_name.fa",$dir),if(-e "Bed.fa/$file/$fa_name.fa");
-		if(! -e "Bed.fa/$file/$fa_name.fa"){
-			mkdir "Join_fa/$file"; 
-			open Join,">Join_fa/$file/$fa_name.fa";
-		}
+		#&getperID("Bed.fa/$file/$fa_name.fa",$dir),if(-e "Bed.fa/$file/$fa_name.fa");
+		#if(! -e "Bed.fa/$file/$fa_name.fa"){
+		#3	mkdir "Join_fa/$file"; 
+		#	open Join,">Join_fa/$file/$fa_name.fa";
+		#}
 	}
 	
 }
 
-sub getperID{
-	my $file=shift;
-	my $dir=shift;
-	print "... python $dir/getperID.py $file $treefile...\n";
-	system("python $dir/getperID.py $file $treefile");
-	#system("mv $file.peridglobal ./GlopperID");
-	#system("mv $file.peridlocal ./LocalperID");
-}
+#sub getperID{
+#	my $file=shift;
+#	my $dir=shift;
+#	print "... python $dir/getperID.py $file $treefile...\n";
+#	system("python $dir/getperID.py $file $treefile");
+#	#system("mv $file.peridglobal ./GlopperID");
+#	#system("mv $file.peridlocal ./LocalperID");
+#}
 
 ######################################print usage
 sub USAGE{
@@ -272,6 +273,8 @@ Name:
     $0  
 Description:
 	#author: pcj 2019.10.9 finished.
+	#revised: ycc 20210303: the scripts will produce a batch files,
+	# which can be run with parallel or submit to SGE cluster
 Usage:
     options:
     --maf_dir|-m       <string>  path for maf files dir 

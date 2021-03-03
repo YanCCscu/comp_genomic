@@ -1,9 +1,9 @@
 #!/bin/bash
-[[ $# -lt 2 ]] && echo -e "\e[1;91msh $0 splitfam gfffile\n\e[0m" && exit 1
+[[ $# -lt 2 ]] && echo -e "\e[1;91msh $0 splitfam gfffile [gerp_dir] [phast_dir] \n\e[0m" && exit 1
 splitmaf=$1
 cds_gff=$2 #Tbai.gff
-gerp_dir=gerp_dir
-phast_dir=phast_dir
+[[ $# -ge 3 ]] && gerp_dir=$3 || gerp_dir=gerp_dir
+[[ $# -ge 4 ]] && gerp_dir=$4 || phast_dir=phast_dir
 cmdir=$(cd $(dirname $0);pwd)
 bed_tools_bin=$cmdir/bedtools2/bin
 echo -e "filter gff to keep only cds ..."
