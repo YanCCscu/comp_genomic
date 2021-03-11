@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -ex
+set -ex
 infasta=$1
 outfasta=$(basename ${infasta%.fa*}).sim.fas
 speciestre=$2 #species.tre
@@ -11,7 +11,7 @@ nw_prune -v $speciestre $(bioawk -c fastx '{printf("%s ",$name)}' $outfasta) > $
 sh $scripts_dir/apply_ancRate.sh -a $outfasta -t ${outtre}.nodes
 python $scripts_dir/toupdate/ConverMutation/ParsePamlRst.py ${outfasta%.*}.rst
 
-rm $outfasta ${outtre}.nodes
+#rm $outfasta ${outtre}.nodes
 
 
 

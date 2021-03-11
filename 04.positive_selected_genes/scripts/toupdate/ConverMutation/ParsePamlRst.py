@@ -4,6 +4,7 @@ from ete3 import Tree
 rstfile=sys.argv[1]
 SeqDict={}
 treestr=""
+specsps=['Tbai','Phum']
 with open(rstfile) as RST:
 	rstline=RST.readline()
 	while True:
@@ -38,14 +39,15 @@ with open(rstfile) as RST:
 
 print(treestr)
 allLen=[len(mseq) for mid,mseq in SeqDict.items()]
-assert len(set(allLen))==1 , "not all seq are in equal length, please cheack!!!" 
+assert len(set(allLen)) == 1 , "not all seq are in equal length, please cheack!!!" 
 t=Tree(treestr,format=1)
 Node_nearAnc=[]
 for node in t.traverse("preorder"):
 	if node.is_leaf():
-		if node.name.strip().split('_')[1] in ['Tbai','Phum']:
+		if node.name.strip().split('_')[1] in specsps:
 			Node_nearAnc.append((node.name.strip().split('_')[1],node.get_ancestors()[0].name))
 print("cal conv ...")
+assert len(Node_nearAnc) == len(specsps), "not all specific species exists in your alignment!!"
 COVOUT=open('conver_genelist.table','a')
 for i in range(allLen[0]):
 	childAA=[]
