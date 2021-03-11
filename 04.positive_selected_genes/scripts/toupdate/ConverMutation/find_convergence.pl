@@ -14,7 +14,8 @@ my @target=split",",$ARGV[0];
 open OUT,">covergence.results.out" or die "can not open results.out\n";
 #opendir GENE_PEP,"$ARGV[1]" or die "can not open $ARGV[1]";
 my $fa_file=$ARGV[1];
-system("/data/nfs/OriginTools/phylogeny_evolution/iqtree-1.6.8-Linux/bin/iqtree -quiet -safe -redo -s $fa_file -m JTT+R4 -asr -te $ARGV[2].nodes") and print STDERR "can not execute /data/nfs/OriginTools/phylogeny_evolution/iqtree-1.6.8-Linux/bin/iqtree -quiet -safe -redo -s $fa_file -m JTT+R4 -asr -te $ARGV[2].nodes \n";
+print STDERR "Now execute: /data/nfs/OriginTools/phylogeny_evolution/iqtree-1.6.8-Linux/bin/iqtree -quiet -safe -redo -s $fa_file -m JTT+R4 -asr -te $ARGV[2] \n";
+system("/data/nfs/OriginTools/phylogeny_evolution/iqtree-1.6.8-Linux/bin/iqtree -quiet -safe -redo -s $fa_file -m JTT+R4 -asr -te $ARGV[2]"); 
 #print "$node_anc\n";
 my %ancenstor;
 	if(-e "$fa_file.state"){
@@ -28,11 +29,15 @@ my %ancenstor;
 					$tar_num++;	
 				}
 			}
+			#print $line[0],"--->",$line[2],"\n";
+			#print "CHECK:",$tar_num,"--->","@target","\tEQEUL:",$line[0],"\n";
 			push @{$ancenstor{$line[0]}},$line[2] if($tar_num==@target);
 		}
+		#print "AAA", %ancenstor;
 		my @nodes=keys %ancenstor;
+		#print "BEGIN>> @nodes <<END";
 		my $ancenstor_near=&sort_len(@nodes);
-		print "$ancenstor_near--\n";	
+		print ">>$ancenstor_near--\n";	
 		my %matrix=();
 		my $len=();
 		open FA,"$fa_file" or die "can not open $fa_file\n";
@@ -47,7 +52,7 @@ my %ancenstor;
 			}
 			my $names=$line[0];
 			$names=~s/\s+//g;
-	#print "$names--$fa_file\n";
+			print "??$names--$fa_file\n";
         		my $seq=join"",@line[1..$#line];
         		my @aas=split"",$seq;
         		push @{$matrix{$names}}, @aas;

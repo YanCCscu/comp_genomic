@@ -190,7 +190,7 @@ sub out_put_seq{
 		foreach my $seq(keys %{$maf_seq}){
 			my @heads=split/\-/,$seq;
                 	if($heads[0]=~/$line[0]/ && $line[1] >= $heads[1] && $line[1]-1 <= $heads[2] && $line[2]-1 <= $heads[2]){
-				print "header----@heads\n";
+				#print "header----@heads\n";
 				print "output sequences to ---->> Bed.fa/$file/$fa_name.fa\n";
                 		open FA,">Bed.fa/$file/$fa_name.fa" or die "can not open >Bed.fa/$file/$fa_name.fa";
 				my @infor=split/=/,${$maf_seq{$seq}}[0];
@@ -232,18 +232,18 @@ sub out_put_seq{
 					#print Join ">$infor[0]|$infor[1]|length:$len:bed:$line[1]:maf:$heads[1]-$heads[2]:base:$base_count,len:$len,ali:$ali_end\n";
 					last;
 				}
-                        	foreach my $in(@{$maf_seq{$seq}}){
+				$bed_line=join"\t",@line;
+				print FINAL_BED "$bed_line\t";
+				foreach my $in(@{$maf_seq{$seq}}){
                         		my @infor=split/=/,$in;
 					my $len_ali=$ali_end-$start_new+1;
                                 	my $out_seq=substr($infor[2],$start_new,$len_ali);
                                		#print FA ">$infor[0]|$infor[1]+$start_new|length:$len:ali:$len_ali\n$out_seq\n";
-                               		print "Fasta Seq Info: $infor[0]|$infor[1]+$start_new|length:$len:ali:$len_ali\n" if $infor[0] =~/Tbai/;
+                               		print FINAL_BED "FaSeqInfo:$infor[0]|$infor[1]+$start_new|length:$len:ali:$len_ali\n" if $infor[0] =~/Tbai/;
                                		my @fassp=split/_/,$infor[0];
                                		print FA">$fassp[0]\n$out_seq\n";
 				}
 				
-				$bed_line=join"\t",@line;
-				print FINAL_BED "$bed_line\n";
 				print GETID "python $dir/getperID.py Bed.fa/$file/$fa_name.fa $treefile\n";
                 	}
       		}

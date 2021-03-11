@@ -15,7 +15,7 @@ do
 	maf=$(basename $maf)
 	((1)) && {
 	#reshape GERP results
-	cat MAFBLOCKS/$maf*.block*.GERP.rates.elems.f > $gerp_dir/${maf}.c.con.bed.cname.gerp.bed
+	cat MAFBLOCKS/$maf*.block*.GERP.rates.elems.f|awk -v OFS='\t' 'BEGIN{i=1}{i++;gsub("maf.GERP","maf.GERP"i,$4);print $0}' > $gerp_dir/${maf}.c.con.bed.cname.gerp.bed
 	#merge GERP and PHAST results
 	cat $phast_dir/${maf}.c.con.bed.cname.phas.bed $gerp_dir/${maf}.c.con.bed.cname.gerp.bed > CNE/${maf}.c.con.bed.cname.bed.phas-gerp.bed
 	#sort by Chrom and Start Pos

@@ -1,17 +1,23 @@
-cmdir=$(cd $(dirname $0);pwd)
+#!/bin/bash
+#set -ex
+[[ -L $0 ]] && cmdfile=$(ls -l $0 |awk -F " -> " '{print $2}') || cmdfile=$0
+cmdir=$(cd $(dirname $cmdfile);pwd)
 curdir=$PWD
-FGDIR=/data/backup/yancc/GitRepo/comp_genomic/CNE_pipe_simplify/scripts/ForwardGenomics
-((0)) && {
-python $cmdir/add_tree_node_label.py $curdir/CNE.tre > $curdir/CNE_anc.tre
-nw_labels -I $curdir/CNE.tre|awk 'BEGIN{printf("species pheno\n")}{printf("%s 1\n",$1)}'|sed '/Tbai/s/1/0/' > $curdir/ID.pheno
+cnetree=CNE13.tre
+CNEDIR=/data/backup/yancc/GitRepo/comp_genomic/CNE_pipe_simplify/scripts
+FGDIR=$CNEDIR/ForwardGenomics
+((1)) && {
+python $cmdir/add_tree_node_label.py $curdir/$cnetree > $curdir/CNE_anc.tre
+nw_labels -I $curdir/$cnetree|awk 'BEGIN{printf("species pheno\n")}{printf("%s 1\n",$1)}'|sed -e '/Tbai\|Phum/s/1/0/' > $curdir/ID.pheno
 #add header: branch id pid
 }
 
 peridlocal=allcne.peridlocal
 peridglobal=allcne.peridglobal
 
-[[ $(tail -n +2 allcne.peridglobal|grep -P -c '^A') -gt 1 ]] || sed -i '2,$s/^/A/' $peridglobal 
-[[ $(tail -n +2 allcne.peridlocal|cut -d' ' -f2|grep -P -c '^A') -gt 1 ]] || sed -i '2,$s/ / A/' $peridlocal
+#smapleid can not starts with number, let's try to add an A
+#[[ $(tail -n +2 allcne.peridglobal|grep -P -c '^A') -lt 1 ]] || sed -i '2,$s/^/A/' $peridglobal 
+#[[ $(tail -n +2 allcne.peridlocal|cut -d' ' -f2|grep -P -c '^A') -lt 1 ]] || sed -i '2,$s/ / A/' $peridlocal
 cat $peridglobal|tail -n +2|cut -d ' ' -f1 >ID.list
 
 #peridlocal=OneTest.local

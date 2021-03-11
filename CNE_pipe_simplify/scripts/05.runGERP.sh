@@ -11,7 +11,7 @@ tree=$curdir/$tree
 cmdir=$(cd $(dirname $0);pwd)
 [[ -d $gerp_command ]] &&  rm -rf $gerp_command
 [[ -d $gerp_command ]] || mkdir -p $gerp_command
-phast_bin=$cmdir/tools/phast-1.3/bin
+#phast_bin=$cmdir/tools/phast-1.3/bin
 #--------split maf into blocks
 ((1)) && {
 echo -e "\e[1;91mNOTE: for sure to Clean the MAFBLOCKS dir!!!\e[0m\n"
