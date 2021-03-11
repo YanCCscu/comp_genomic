@@ -32,10 +32,10 @@ shift $(($OPTIND - 1))
 
 
 #set alternative model 
-cat <<EOF > ${inphy%.*}.ctl
+cat <<EOF > aaRate.ctl
      seqfile = $inphy            * sequence data file name
     treefile = $intree     * tree structure file name
-     outfile = ${inphy%.*}.alt.mlc      * main result file name---------------- 
+     outfile = mlc 	   *${inphy%.*}.alt.mlc * main result file name---------------- 
 
         noisy = 3  * 0,1,2,3,9: how much rubbish on the screen
       verbose = 1  * 0: concise; 1: detailed, 2: too much
@@ -70,5 +70,6 @@ EOF
 #The branch-site model is specified by setting the model parameter to 2 (different dN/dS for branches) and 
 #the NSosites value to 2 (which allows 3 categories for sites: purifying, neutral and positive selection
 
-$toolsdir/codeml ${inphy%.*}.ctl 
+$toolsdir/codeml aaRate.ctl 
 mv rst ${inphy%.*}.rst
+
